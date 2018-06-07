@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+import sys, os
+
+
+server_name = sys.argv[1]
+server_command = sys.argv[2]
+server_path = '/proj/'+server_name+'/venv'
+
+
+if os.path.isdir('/proj/'+server_name+'/venv'):
+	os.system('cd '+server_path)
+	os.system('. '+server_path+'/bin/activate')
+	os.system('export FLASK_APP=./web/index.py')
+
+
+
+
+
+
+
+
+print('Hello')
