@@ -13,6 +13,19 @@ class Database:
         self.cur.execute(q, params)
         return self.cur.fetchall()
 
+    def selectObject(self, q, params=None):
+        if not self.con.is_connected():
+            self.con.reconnect()
+        self.cur.execute(q, params)
+        return dict(zip([c[0] for c in self.cur.description], self.cur.fetchone()))
+
+
+    def selectObjects(self, q, params=None):
+        if not self.con.is_connected():
+            self.con.reconnect()
+        self.cur.execute(q, params)
+        return [dict(zip([c[0] for c in self.cur.description], x)) for x in self.cur.fetchall()]
+
     def do(self, q, params=None):
         if not self.con.is_connected():
             self.con.reconnect()
