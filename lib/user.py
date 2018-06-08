@@ -11,19 +11,19 @@ class User:
 
     def create(self, username, password, first_name=None, last_name=None, email=None):
         q = '''
-			INSERT INTO users
-			(
-				username,
-				first_name,
-				last_name,
-				email,
-				password
-			)
-			VALUES
-			(
-				%s, %s, %s, %s, %s					
-			)
-		'''
+            INSERT INTO users
+            (
+                username,
+                first_name,
+                last_name,
+                email,
+                password
+            )
+            VALUES
+            (
+                %s, %s, %s, %s, %s
+            )
+        '''
 
         return db.do(q, (username, first_name, last_name, email, self.encryptPass(password)))
 

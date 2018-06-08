@@ -5,13 +5,11 @@ import router
 
 app = Flask(__name__)
 
+
 @app.route('/', methods=['POST'])
 def index():
-	if request.method == "POST":
-		action = request.json['action']
-	func = getattr(router, action, None)
-	if func:
-		return jsonify(func(**request.json))
-
-
-
+    if request.method == "POST":
+        action = request.json['action']
+    func = getattr(router, action, None)
+    if func:
+        return jsonify(func(**request.json))
