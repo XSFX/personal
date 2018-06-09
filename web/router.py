@@ -15,3 +15,6 @@ def createUser(**params):
 
 def listUsers(**params):
     return user.list()
+
+def loginUser(**params):
+    return user.auth(**params)
