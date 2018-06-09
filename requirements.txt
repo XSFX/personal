@@ -1,2 +1,2 @@
-authlib
+PyJWT
 mysql-connector-python
