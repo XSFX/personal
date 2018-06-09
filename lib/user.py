@@ -1,4 +1,5 @@
 import bcrypt
+import jwt
 from database import database as db
 
 
@@ -23,15 +24,29 @@ class User:
             (
                 %s, %s, %s, %s, %s
             )
-        '''
+            '''
 
         return db.do(q, (username, first_name, last_name, email, self.encryptPass(password)))
+
+    def auth(self, **params):
+        q = '''
+                SELECT 
+                    password
+                FROM
+                    users
+                WHERE 
+                    username = %s
+            '''
+        return self.checkPass(password = params['password'], hashed =  db.selectObject(q, (params['username'], ))['password'])
 
     def encryptPass(self, password):
         return bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
 
-    def checkPass(self, password, hashed):
-        return bcrypt.checkpw(password.encode('utf8'), hashed.encode('utf8'))
+    def checkPass(self, **params):
+        return bcrypt.checkpw(params['password'].encode('utf8'), params['hashed'].encode('utf8'))
 
+    def sessionCreate(self, **params):
+            return jwt.encode({"some":"test"}, params['secret'], algorithm='HS256')
+        pass
 
 user = User()
