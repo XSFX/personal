@@ -5,7 +5,7 @@ import mysql.connector
 class Database:
     def __init__(self):
         self.con = mysql.connector.connect(**config.d)
-        self.cur = self.con.cursor()
+        self.cur = self.con.cursor(buffered = True)
 
     def select(self, q, params=None):
         if not self.con.is_connected():
@@ -17,6 +17,8 @@ class Database:
         if not self.con.is_connected():
             self.con.reconnect()
         self.cur.execute(q, params)
+        if self.cur.rowcount < 1:
+            return {}
         return dict(zip([c[0] for c in self.cur.description], self.cur.fetchone()))
 
 

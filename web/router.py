@@ -18,3 +18,6 @@ def listUsers(**params):
 
 def loginUser(**params):
     return user.auth(**params)
+
+def checkUserToken(**params):
+    return user.checkToken(**params)

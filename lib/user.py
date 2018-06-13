@@ -1,7 +1,7 @@
 import bcrypt
 import jwt
+from datetime import datetime
 from database import database as db
-
 
 class User:
     def __init__(self):
@@ -29,15 +29,24 @@ class User:
         return db.do(q, (username, first_name, last_name, email, self.encryptPass(password)))
 
     def auth(self, **params):
-        q = '''
-                SELECT 
-                    password
-                FROM
-                    users
-                WHERE 
-                    username = %s
-            '''
-        return self.checkPass(password = params['password'], hashed =  db.selectObject(q, (params['username'], ))['password'])
+        q = '''SELECT * FROM users WHERE username = %s OR email = %s'''
+        user = db.selectObject(q, (params['username'], params['username']))
+        if 'password' in user and self.checkPass(password = params['password'], hashed = user['password']):
+            token = self.sessionCreate(username = user['username'], secret = user['username'])
+            q = '''
+                    REPLACE INTO sessions (username, token, expires) VALUES(%s, %s, now() + INTERVAL 1 DAY)
+                '''
+            db.do(q, (user['username'], token, ))
+            return {"username":user['username'], "token":token}
+        return False
+
+    def checkToken(self, **params):
+        q = ''' SELECT * FROM sessions where username = %s'''
+        session = db.selectObject(q, (params['username'], ))
+        if jwt.decode(session['token'], params['username'], algorithms=['HS256'])['username'] == params['username']:
+            return True
+        return False
+
 
     def encryptPass(self, password):
         return bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
@@ -46,7 +55,6 @@ class User:
         return bcrypt.checkpw(params['password'].encode('utf8'), params['hashed'].encode('utf8'))
 
     def sessionCreate(self, **params):
-            return jwt.encode({"some":"test"}, params['secret'], algorithm='HS256')
-        pass
+        return jwt.encode({"createdAt":str(datetime.now()), 'username': str(params['username'])}, str(params['secret']), algorithm='HS256')
 
 user = User()
