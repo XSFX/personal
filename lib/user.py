@@ -41,9 +41,13 @@ class User:
         return False
 
     def checkToken(self, **params):
+        if 'username' not in params:
+            return {'error': 'Parameter "username" is required'}
+        if 'token' not in params:
+            return {'error': 'Parameter "token" is required'}
         q = ''' SELECT * FROM sessions where username = %s'''
         session = db.selectObject(q, (params['username'], ))
-        if jwt.decode(session['token'], params['username'], algorithms=['HS256'])['username'] == params['username']:
+        if params['token'] == session['token'] and jwt.decode(params['token'], params['username'], algorithms=['HS256'])['username'] == params['username']:
             return True
         return False
 
